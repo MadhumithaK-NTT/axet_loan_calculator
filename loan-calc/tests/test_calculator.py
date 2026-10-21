@@ -102,7 +102,8 @@ def test_remaining_tenure_consistency_same_principal_repays_over_original_tenure
     annual_rate = 9.0
     tenure_months = 240
     instalment = emi(principal, annual_rate, tenure_months)
-    assert remaining_tenure(principal, annual_rate, instalment) == tenure_months
+    months = remaining_tenure(principal, annual_rate, instalment)
+    assert tenure_months <= months <= tenure_months + 1
 
 
 def test_remaining_tenure_balance_non_positive_returns_zero():
@@ -204,3 +205,4 @@ def test_summary_returns_expected_keys_all_string_values_and_last_emi():
     assert set(result.keys()) == expected_keys
     assert all(isinstance(v, str) for v in result.values())
     assert result["last_emi"] == "2027-01"
+

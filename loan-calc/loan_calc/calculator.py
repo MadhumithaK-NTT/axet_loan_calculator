@@ -152,7 +152,7 @@ def remaining_tenure(balance: float, annual_rate: float, instalment: float) -> i
         ValueError: If the instalment is insufficient to repay a positive
             balance at the calculated interest rate.
     """
-    r = annual_rate / 100
+    r = _monthly_rate(annual_rate)
     if balance <= 0:
         return 0
     if r == 0:
@@ -361,3 +361,4 @@ def summary(
         "last_emi": f"{end_year}-{end_month:02d}",
         "currency": DEFAULT_CURRENCY,
     }
+
