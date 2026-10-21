@@ -192,14 +192,15 @@ def prepayment_savings(
               the prepayment point.
 
     Notes:
-        The current implementation does not validate prepayment month values
-        or prepayment amounts. It does not guarantee safe handling of
-        prepayments greater than the outstanding balance.
+        This function does not validate prepayment month values or negative
+        prepayment amounts. A prepayment exceeding the outstanding balance is
+        capped at that balance.
     """
     instalment = emi(principal, annual_rate, tenure_months)
     sched = amortisation_schedule(principal, annual_rate, tenure_months)
     balance = sched[prepay_month - 1]["balance"]
-    new_balance = balance - prepay_amount
+    effective_prepay = min(prepay_amount, balance)
+    new_balance = balance - effective_prepay
     if new_balance <= 0:
         months_left = 0
     else:
@@ -207,7 +208,7 @@ def prepayment_savings(
     original_left = tenure_months - prepay_month
     interest_paid_so_far = sum(row["interest"] for row in sched[:prepay_month])
     original_interest = total_interest(principal, annual_rate, tenure_months)
-    new_total = instalment * prepay_month + prepay_amount + instalment * months_left
+    new_total = instalment * prepay_month + effective_prepay + instalment * months_left
     new_interest = new_total - principal
     return {
         "emi": instalment,
@@ -361,4 +362,3 @@ def summary(
         "last_emi": f"{end_year}-{end_month:02d}",
         "currency": DEFAULT_CURRENCY,
     }
-
